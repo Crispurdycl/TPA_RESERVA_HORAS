@@ -5,11 +5,11 @@ from tkinter import messagebox
 class Reservas():
 
     def __init__(self):
+
         self.ventana = tk.Tk() 
         self.ventana.geometry('800x600')
         self.ventana.title("Reservaciones LOS PEPE ICINF")
         self.ventana.configure(bg='#f0f0f0')  # Fondo gris claro
-
         self.estilo_principal = ("Helvetica", 24, "bold")
         self.estilo_entry = ("Arial", 10)
         self.estilo_boton = ("Arial", 10, "bold")
@@ -56,31 +56,35 @@ class Reservas():
         self.reservas_guardadas = []  
         self.horarios_reservados = set()
 
+        self.abrir_reserva_boton = tk.Button(self.frame_principal, text="Ver reservas", command=self.abrir_reserva, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
+        self.abrir_reserva_boton.pack(pady=10)
+
     def reservar(self):
         nombre = self.usuario_entry.get()
         recinto = self.recinto_select.get()
         hora = self.hora_select.get()
-        if nombre == "" or recinto == "Seleccione recinto" or hora == "Seleccione hora":
+        
+        if nombre == "" or recinto == "Seleccione una opción" or hora == "Seleccione hora":
             messagebox.showerror("Error", "Debe completar todos los campos")
-        elif hora in self.horarios_reservados:
-            messagebox.showerror("Error", "Este horario ya ha sido reservado")
+        elif any(reserva["recinto"] == recinto and reserva["hora"] == hora for reserva in self.reservas_guardadas):
+            messagebox.showerror("Error", "Este horario ya ha sido reservado para este recinto")
         else:
             reserva = {"nombre": nombre, "recinto": recinto, "hora": hora}
-            self.reservas_guardadas.append(reserva)  
-            self.horarios_reservados.add(hora)
+            self.reservas_guardadas.append(reserva)
+            self.horarios_reservados.add((recinto, hora))  # Usamos una tupla para guardar recinto y hora juntos
             messagebox.showinfo("Reserva realizada", f"Reserva realizada con éxito\nNombre: {nombre}\nRecinto: {recinto}\nHora: {hora}")
-            self.guardar_reservas()  
+            self.guardar_reservas()
             self.cancelar()
 
     def cargar_horas(self):
         recinto = self.recinto_select.get()
         horas = []
         if recinto == "Cancha de Fútbol":
-            horas = ["Seleccione hora", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00"]
+            horas = ["Seleccione hora", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"]
         elif recinto == "Cancha de Tenis":
-            horas = ["Seleccione hora", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"]
+            horas = ["Seleccione hora", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"]
         elif recinto == "Cancha de Pádel":
-            horas = ["Seleccione hora", "20:00", "21:00", "22:00", "23:00"]
+            horas = ["Seleccione hora", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"]
         self.hora_select.set(horas[0])
         self.hora_select_menu['menu'].delete(0, 'end')
         for hora in horas:
@@ -94,6 +98,10 @@ class Reservas():
     def guardar_reservas(self):
         with open("reservas.json", "w") as fecha1:
             json.dump(self.reservas_guardadas, fecha1)
+
+    def abrir_reserva(self):
+        app2 = VisualizarReservas()
+        app2.ventana.mainloop()
 
 class VisualizarReservas():
 
@@ -146,5 +154,3 @@ class VisualizarReservas():
 if __name__ == '__main__':
     app = Reservas()
     app.ventana.mainloop()
-    app2 = VisualizarReservas()
-    app2.ventana.mainloop()
