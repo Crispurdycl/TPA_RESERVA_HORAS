@@ -321,7 +321,7 @@ class VisualizarReservas():
             json.dump(self.reservas, fecha1)
 
 
-0
+
 if __name__ == '__main__':
     app = Reservas()
     app.ventana.mainloop()
