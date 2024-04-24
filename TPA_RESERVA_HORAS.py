@@ -1,17 +1,29 @@
-import tkinter as tk
-import json
-from tkinter import messagebox
+import tkinter as tk            # para la interfaz gráfica
+import json                     # para guardar las reservas en un archivo .json para simular una base de datos
+from tkinter import messagebox  # para mostrar mensajes de error o información
 
-
+# Clase para realizar reservas
+# Se pueden realizar reservas en una cancha de fútbol, tenis o pádel
+# Se puede reservar una hora de 08:00 a 23:00
+# Se puede reservar solo una hora por día en alguno de los establecimientos
+# Se puede reservar solo una vez el mismo horario en el mismo establecimiento
+# Se pueden ver las reservas guardadas
+# ejemplo: si se reserva la cancha de fútbol a las 08:00, no se puede reservar la cancha de fútbol a las 08:00
 
 class Reservas():
 
+    # Constructor de la clase
+
     def __init__(self):
+
+        # Creación de la ventana principal, definición de su tamaño y título
 
         self.ventana = tk.Tk() 
         self.ventana.geometry('800x600')
-        self.ventana.title("Reservaciones LOS PEPE ICINF")
+        self.ventana.title("Reservaciones ICINF")
         self.ventana.configure(bg='#f0f0f0')
+
+        # Estilos de la interfaz gráfica
 
         self.estilo_principal = ("Helvetica", 24, "bold")
         self.estilo_entry = ("Arial", 10)
@@ -20,6 +32,14 @@ class Reservas():
         self.color_boton = "#004080"
         self.color_fondo_boton = "#b3d9ff"
         self.color_texto_boton = "white"
+
+        # Creación de los elementos de la interfaz gráfica mejor conocidos como widgets
+        # Se crean etiquetas, campos de entrada, menús desplegables y botones
+        # Se definen las propiedades de cada widget
+        # Se empaquetan los widgets en un frame principal
+        # Se empaqueta el frame principal en la ventana principal
+        # Se definen los eventos que se ejecutarán al presionar los botones "Reservar", "Cancelar" y "Ver reservas"
+        # Estos llamaran a los metodos reservar(), cancelar() y abrir_reserva() respectivamente
 
         self.frame_principal = tk.Frame(self.ventana, bg='#f0f0f0')
         self.frame_principal.pack(expand=True, padx=20, pady=20)
@@ -62,124 +82,148 @@ class Reservas():
         self.abrir_reserva_boton = tk.Button(self.frame_principal, text="Ver reservas", command=self.abrir_reserva, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
         self.abrir_reserva_boton.pack(pady=10)
 
+    # Métodos de la clase
+    # Llamamos a la función reservar() cuando se presiona el botón "Reservar"
+    # Esta función se encarga de validar los datos ingresados por el usuario y de realizar la reserva
+    # Si los datos son correctos, se guarda la reserva en un archivo .json y se muestra un mensaje de éxito
+    # Si hay algún error, se muestra un mensaje de error correspondiente
 
+    def reservar(self): # Método
 
-    def reservar(self):
+        nombre = str(self.usuario_entry.get()) # Se obtienen los datos ingresados por el usuario
+        recinto = self.recinto_select.get() # Se obtienen los datos ingresados por el usuario x2
+        hora = self.hora_select.get() # Se obtienen los datos ingresados por el usuario x3
+        nombre.lower() # Se convierte el nombre de usuario a minúsculas
 
-        nombre = str(self.usuario_entry.get())
-        recinto = self.recinto_select.get()
-        hora = self.hora_select.get()
-        nombre.lower()
+        while True: # Bucle infinito para validar los datos ingresados por el usuario
 
-        # chequear si no existe otro usuario con el mismo nombre
+            if not nombre: # Si no se ingresa un nombre de usuario
 
-        while True:
-
-            if not nombre:
-
-                messagebox.showerror("Error", "Debe ingresar un nombre de usuario")
+                messagebox.showerror("Error", "Debe ingresar un nombre de usuario") # Se muestra un mensaje de error
                 break
 
-            elif not nombre.isalpha() and nombre.isspace() or nombre.isnumeric():
-
-                messagebox.showerror("Error", "El nombre de usuario solo puede contener letras")
+            elif len(nombre) < 3 or len(nombre) > 25: # Si el nombre de usuario tiene menos de 3 letras o más de 25
+                    
+                messagebox.showerror("Error", "El nombre de usuario debe tener al menos 3 letras y no más de 25") # Se muestra un mensaje de error
                 break
+
+            elif any(character.isdigit() for character in nombre): # Si el nombre de usuario contiene números
+
+                messagebox.showerror("Error", "El nombre de usuario no puede contener números") # Se muestra un mensaje de error
+                break
+
+            elif not recinto or recinto == "Seleccione una opción": # Si no se selecciona un recinto
+
+                messagebox.showerror("Error", "Debe seleccionar un recinto") # Se muestra un mensaje de error
+                break
+
+            elif not hora or hora == "Seleccione hora": # Si no se selecciona una hora
+
+                messagebox.showerror("Error", "Debe seleccionar una hora") # Se muestra un mensaje de error
+                break
+
+            elif any(reserva["nombre"] == nombre for reserva in self.reservas_guardadas): # Si el usuario ya ha reservado una hora en algún recinto
             
-            elif not recinto:
-
-                messagebox.showerror("Error", "Debe seleccionar un recinto")
+                messagebox.showerror("Error", "Solo puedes reservar 1 hora por día en alguna de nuestros establecimientos") # Se muestra un mensaje de error
                 break
 
-            elif not hora:
-
-                messagebox.showerror("Error", "Debe seleccionar una hora")
-                break
-
-            elif any(reserva["nombre"] == nombre for reserva in self.reservas_guardadas):
+            elif any(reserva["recinto"] == recinto and reserva["hora"] == hora for reserva in self.reservas_guardadas): # Si el horario ya ha sido reservado para el recinto seleccionado
             
-                messagebox.showerror("Error", "Solo puedes reservar 1 hora por día en alguna de nuestros establecimientos")
-                break
-
-            elif any(reserva["recinto"] == recinto and reserva["hora"] == hora for reserva in self.reservas_guardadas):
-            
-                messagebox.showerror("Error", "Este horario ya ha sido reservado para este recinto")
+                messagebox.showerror("Error", "Este horario ya ha sido reservado para este recinto") # Se muestra un mensaje de error
                 break
 
             else:
 
-                reserva = {"nombre": nombre, "recinto": recinto, "hora": hora}
-                self.reservas_guardadas.append(reserva)
-                self.horarios_reservados.add((recinto, hora))
-                messagebox.showinfo("Reserva realizada", f"Reserva realizada con éxito\nNombre: {nombre}\nRecinto: {recinto}\nHora: {hora}")
-                self.guardar_reservas()
-                self.cancelar()
+                reserva = {"nombre": nombre, "recinto": recinto, "hora": hora} # Se crea un diccionario con los datos de la reserva
+                self.reservas_guardadas.append(reserva) # Se añade la reserva a la lista de reservas guardadas
+                self.horarios_reservados.add((recinto, hora)) # Se añade el horario reservado al conjunto de horarios reservados
+                messagebox.showinfo("Reserva realizada", f"Reserva realizada con éxito\nNombre: {nombre}\nRecinto: {recinto}\nHora: {hora}") # Se muestra un mensaje de éxito
+                self.guardar_reservas() # Se guardan las reservas en el archivo .json
+                self.cancelar() # Se llama a la función cancelar() para limpiar los campos de usuario, recinto y hora
                 break
 
+    # Método para cargar las horas disponibles según el recinto seleccionado
+    # Se cargan las horas disponibles según el recinto seleccionado
+    # Si el recinto es una cancha de fútbol, tenis o pádel, se cargan las horas de 08:00 a 23:00
+    # Si el recinto es una sala de estudio, se cargan las horas de 08:00 a 20:00
 
+    def cargar_horas(self): # Método
 
-    def cargar_horas(self):
+        recinto = self.recinto_select.get() # Se obtiene el recinto seleccionado
+        horas = [] # Se crea una lista para almacenar las horas disponibles
 
-        recinto = self.recinto_select.get()
-        horas = []
+        if recinto in ["Cancha de Fútbol", "Cancha de Tenis", "Cancha de Pádel"]: # Si el recinto es una cancha de fútbol, tenis o pádel
 
-        if recinto in ["Cancha de Fútbol", "Cancha de Tenis", "Cancha de Pádel"]:
+            horas = ["Seleccione hora", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"] # Se cargan las horas de 08:00 a 23:00
 
-            horas = ["Seleccione hora", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"]
+        self.hora_select.set(horas[0]) # Se selecciona la primera hora disponible
+        self.hora_select_menu['menu'].delete(0, 'end') # Se eliminan las horas disponibles del menú desplegable
 
-        self.hora_select.set(horas[0])
-        self.hora_select_menu['menu'].delete(0, 'end')
+        for hora in horas: # Se recorren las horas disponibles
 
-        for hora in horas:
+            self.hora_select_menu['menu'].add_command(label=hora, command=tk._setit(self.hora_select, hora)) # Se cargan las horas disponibles en el menú desplegable
 
-            self.hora_select_menu['menu'].add_command(label=hora, command=tk._setit(self.hora_select, hora))
+    # Método para cancelar la reserva
+    # Se limpian los campos de usuario, recinto y hora
 
+    def cancelar(self): # Método
 
+        self.usuario_entry.delete(0, tk.END) # Se limpian los campos de usuario, recinto y hora
+        self.recinto_select.set("Seleccione una opción") # Se limpian los campos de usuario, recinto y hora
+        self.hora_select.set("Seleccione hora") # Se limpian los campos de usuario, recinto y hora
 
-    def cancelar(self):
+    # Método para guardar las reservas en un archivo .json
+    # Se guardan las reservas en un archivo .json para simular una base de datos
 
-        self.usuario_entry.delete(0, tk.END)
-        self.recinto_select.set("Seleccione una opción")
-        self.hora_select.set("Seleccione hora")
+    def guardar_reservas(self): # Método
 
+        with open("reservas.json", "w") as fecha1: # Se abre el archivo .json de reservas
 
+            json.dump(self.reservas_guardadas, fecha1) # Se guardan las reservas en el archivo .json
 
-    def guardar_reservas(self):
+    # Método para listar las reservas guardadas
+    # Se listan las reservas guardadas en el archivo .json
+    # Se muestran en un cuadro de texto las reservas guardadas
 
-        with open("reservas.json", "w") as fecha1:
+    def listar_reservas(self): # Método
 
-            json.dump(self.reservas_guardadas, fecha1)
+        self.reservas_text.config(state=tk.NORMAL) # Se habilita la edición del cuadro de texto de reservas
+        self.reservas_text.delete(1.0, tk.END) # Se limpia el cuadro de texto de reservas
 
+        for reserva in self.reservas_guardadas: # Se recorren las reservas guardadas
 
-
-    def listar_reservas(self):
-
-        self.reservas_text.config(state=tk.NORMAL)
-        self.reservas_text.delete(1.0, tk.END)
-
-        for reserva in self.reservas_guardadas:
-
-            self.reservas_text.insert(tk.END, f"Nombre: {reserva['nombre']}\nRecinto: {reserva['recinto']}\nHora: {reserva['hora']}\n\n")
+            self.reservas_text.insert(tk.END, f"Nombre: {reserva['nombre']}\nRecinto: {reserva['recinto']}\nHora: {reserva['hora']}\n\n") # Se muestra la reserva en el cuadro de texto de reservas
         
-        self.reservas_text.config(state=tk.DISABLED)
+        self.reservas_text.config(state=tk.DISABLED) # Se deshabilita la edición del cuadro de texto de reservas
 
+    # Método para abrir la ventana de visualización de reservas
+    # Se cierra la ventana actual y se abre la ventana de visualización de reservas
 
-
-    def abrir_reserva(self):
+    def abrir_reserva(self): # Método
         
-        self.ventana.destroy()
-        app2 = VisualizarReservas()
-        app2.ventana.mainloop()
+        self.ventana.destroy() # Se cierra la ventana actual
+        app2 = VisualizarReservas() # Se crea una instancia de la clase VisualizarReservas
+        app2.ventana.mainloop() # Se inicia la ventana principal
 
-
+# clase para visualizar las reservas guardadas
+# Se muestra un cuadro de texto con las reservas guardadas
+# Se puede buscar una reserva por el nombre del usuario
+# Se puede eliminar una reserva por el nombre del usuario
         
 class VisualizarReservas():
 
+    # Constructor de la clase
+
     def __init__(self):
+
+        # Creación de la ventana principal, definición de su tamaño y título
         
         self.ventana = tk.Tk()
         self.ventana.geometry('800x600')
-        self.ventana.title("Reservaciones LOS PEPE ICINF")
+        self.ventana.title("Reservaciones ICINF")
         self.ventana.configure(bg='#f0f0f0')
+
+        # Estilos de la interfaz gráfica
 
         self.estilo_principal = ("Helvetica", 24, "bold")
         self.estilo_entry = ("Arial", 10)
@@ -188,6 +232,14 @@ class VisualizarReservas():
         self.color_boton = "#004080"
         self.color_fondo_boton = "#b3d9ff"
         self.color_texto_boton = "white"
+
+        # Creación de los elementos de la interfaz gráfica mejor conocidos como widgets
+        # Se crean etiquetas, campos de entrada y botones
+        # Se definen las propiedades de cada widget
+        # Se empaquetan los widgets en un frame principal
+        # Se empaqueta el frame principal en la ventana principal
+        # Se definen los eventos que se ejecutarán al presionar los botones "Buscar", "Eliminar reserva" y "Volver"
+        # Estos llamaran a los metodos buscar_reserva(), eliminar_reserva() y volver() respectivamente
 
         self.frame_principal = tk.Frame(self.ventana, bg='#f0f0f0')
         self.frame_principal.pack(expand=True, padx=20, pady=20)
@@ -215,113 +267,155 @@ class VisualizarReservas():
             
         self.eliminar_boton = tk.Button(self.frame_principal, text="Eliminar reserva", command=self.eliminar_reserva, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
         self.eliminar_boton.pack(pady=10)
+
+        self.volver_boton = tk.Button(self.frame_principal, text="Volver", command=self.volver, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
+        self.volver_boton.pack(pady=10) 
+
+        # Se cargan las reservas guardadas en el archivo .json
+        # Se verifica si hay reservas guardadas
+        # Si no hay reservas guardadas, se muestra un mensaje de información y se cierra la ventana
+        # Si hay reservas guardadas, se cargan en el cuadro de texto de reservas
+
+        self.cargar_reservas() # Se llama a la función cargar_reservas() para cargar las reservas guardadas en el archivo .json
+        self.esta_vacia() # Se llama a la función esta_vacia()
+
+    # Métodos de la clase
+
+    # Llamamos a la función esta_vacia() cuando se abre la ventana
+    # Esta función verifica si hay reservas guardadas
+    # Si no hay reservas guardadas, se muestra un mensaje de información y se cierra la ventana
+    # Si hay reservas guardadas, se cargan en el cuadro de texto de reservas
+
+    def esta_vacia(self): # Método
+
+        if not self.reservas: # Si no hay reservas guardadas
+
+            messagebox.showinfo("Información", "No hay reservas guardadas") # Se muestra un mensaje de información
+            self.ventana.destroy() # Se cierra la ventana actual
+            app = Reservas() # Se crea una instancia de la clase Reservas
+            app.ventana.mainloop() # Se inicia la ventana principal
+
+        else: # Si hay reservas guardadas
+
+            self.cargar_reservas() # Se cargan las reservas guardadas en el cuadro de texto de reservas
+
+    # Método para cargar las reservas guardadas
+    # Se cargan las reservas guardadas en el archivo .json
+    # Se cargan las reservas guardadas en el cuadro de texto de reservas
+
+    def cargar_reservas(self): # Método
         
-        self.cargar_reservas()
-        self.esta_vacia()
+        self.reservas_text.delete(1.0, tk.END) # Se limpia el cuadro de texto de reservas
 
+        with open("reservas.json", "r") as fecha1: # Se abre el archivo .json de reservas
 
-
-    def esta_vacia(self):
-
-        if not self.reservas:
-
-            messagebox.showinfo("Información", "No hay reservas guardadas")
-            self.ventana.destroy()
-            app = Reservas()
-            app.ventana.mainloop()
-
-        else:
-
-            self.cargar_reservas()
-
-
-
-    def cargar_reservas(self):
-        
-        self.reservas_text.delete(1.0, tk.END)
-
-        with open("reservas.json", "r") as fecha1:
-
-            self.reservas = json.load(fecha1)
+            self.reservas = json.load(fecha1) # Se cargan las reservas guardadas en el archivo .json
             
-            for reserva in self.reservas:
+            for reserva in self.reservas: # Se recorren las reservas guardadas
             
-                self.reservas_text.insert(tk.END, f"Nombre: {reserva['nombre']}\nRecinto: {reserva['recinto']}\nHora: {reserva['hora']}\n\n")
+                self.reservas_text.insert(tk.END, f"Nombre: {reserva['nombre']}\nRecinto: {reserva['recinto']}\nHora: {reserva['hora']}\n\n") # Se muestra la reserva en el cuadro de texto de reservas
             
-            self.reservas_text.config(state=tk.DISABLED)
+            self.reservas_text.config(state=tk.DISABLED) # Se deshabilita la edición del cuadro de texto de reservas
 
-
+    # Método para buscar una reserva por el nombre del usuario
+    # Se busca una reserva por el nombre del usuario
+    # Se muestra en el cuadro de texto de reservas las reservas encontradas
+    # Si no se encuentra ninguna reserva, se muestra un mensaje de información
 
     def buscar_reserva(self):
 
-        nombre_buscar = self.buscar_entry.get()
-        self.reservas_text.config(state=tk.NORMAL)
-        self.reservas_text.delete(1.0, tk.END)
-        encontradas = []
+        nombre_buscar = self.buscar_entry.get() # Se obtiene el nombre del usuario a buscar
+        self.reservas_text.config(state=tk.NORMAL) # Se habilita la edición del cuadro de texto de reservas
+        self.reservas_text.delete(1.0, tk.END) # Se limpia el cuadro de texto de reservas
+        encontradas = [] # Se crea una lista para almacenar las reservas encontradas
         
-        with open("reservas.json", "r") as fecha1:
+        with open("reservas.json", "r") as fecha1: # Se abre el archivo .json de reservas
 
-            self.reservas = json.load(fecha1)
+            self.reservas = json.load(fecha1) # Se cargan las reservas guardadas en el archivo .json
 
-            for reserva in self.reservas:
+            for reserva in self.reservas: # Se recorren las reservas guardadas
 
-                if nombre_buscar.lower() in reserva['nombre'].lower():
+                if nombre_buscar.lower() in reserva['nombre'].lower(): # Se busca la reserva por el nombre del usuario
 
-                    encontradas.append(reserva)
-                    self.reservas_text.insert(tk.END, f"Nombre: {reserva['nombre']}\nRecinto: {reserva['recinto']}\nHora: {reserva['hora']}\n\n")
+                    encontradas.append(reserva) # Se agrega la reserva a la lista de reservas encontradas
+                    self.reservas_text.insert(tk.END, f"Nombre: {reserva['nombre']}\nRecinto: {reserva['recinto']}\nHora: {reserva['hora']}\n\n") # Se muestra la reserva en el cuadro de texto de reservas
 
-        self.reservas_text.config(state=tk.DISABLED)
+        self.reservas_text.config(state=tk.DISABLED) # Se deshabilita la edición del cuadro de texto de reservas
 
-        if not encontradas:
+        if not encontradas: # Si no se encuentra ninguna reserva
 
-            messagebox.showinfo("Información", "No se encontraron reservas con ese nombre.")
+            messagebox.showinfo("Información", "No se encontraron reservas con ese nombre.") # Se muestra un mensaje de información
 
+    # Método para eliminar una reserva por el nombre del usuario
+    # Se elimina una reserva por el nombre del usuario
+    # Se muestra un mensaje de éxito si se elimina la reserva
+    # Se muestra un mensaje de información si no se encuentra la reserva
+    # Se muestra un mensaje de información si se eliminan todas las reservas
+    # Se cierra la ventana actual y se abre la ventana de reservas
 
-
-    def eliminar_reserva(self):
+    def eliminar_reserva(self): # Método
         
-        nombre_buscar = self.buscar_entry.get()
-        if not nombre_buscar:
+        nombre_buscar = self.buscar_entry.get() # Se obtiene el nombre del usuario a buscar
         
-            messagebox.showinfo("Información", "Debe ingresar un usuario para poder eliminar una reserva")
-            return
+        if not nombre_buscar: # Si no se ingresa un nombre de usuario
         
-        else:
+            messagebox.showinfo("Información", "Debe ingresar un usuario para poder eliminar una reserva") # Se muestra un mensaje de información
+            return 
+        
+        else: # Si se ingresa un nombre de usuario
             
-            self.reservas = json.load(open("reservas.json"))
+            self.reservas = json.load(open("reservas.json")) # Se cargan las reservas guardadas en el archivo .json
 
-        for reserva in self.reservas:
+        for reserva in self.reservas: # Se recorren las reservas guardadas
 
-            if nombre_buscar.lower() in reserva['nombre'].lower():
+            if nombre_buscar.lower() in reserva['nombre'].lower(): # Se busca la reserva por el nombre del usuario
 
-                self.reservas.remove(reserva)
-                self.reservas_text.config(state=tk.NORMAL)
-                self.reservas_text.delete(1.0, tk.END)
+                self.reservas.remove(reserva) # Se elimina la reserva
+                self.reservas_text.config(state=tk.NORMAL) # Se habilita la edición del cuadro de texto de reservas
+                self.reservas_text.delete(1.0, tk.END) # Se limpia el cuadro de texto de reservas
                 
-                for reserva in self.reservas:
+                for reserva in self.reservas: # Se recorren las reservas guardadas
                     
-                    self.reservas_text.insert(tk.END, f"Nombre: {reserva['nombre']}\nRecinto: {reserva['recinto']}\nHora: {reserva['hora']}\n\n")
+                    self.reservas_text.insert(tk.END, f"Nombre: {reserva['nombre']}\nRecinto: {reserva['recinto']}\nHora: {reserva['hora']}\n\n") # Se muestra la reserva en el cuadro de texto de reservas
                 
-                self.reservas_text.config(state=tk.DISABLED)
-                self.guardar_reservas()
-                messagebox.showinfo("Información", "Reserva eliminada.")
+                self.reservas_text.config(state=tk.DISABLED) # Se deshabilita la edición del cuadro de texto de reservas
+                self.guardar_reservas() # Se guardan las reservas en el archivo .json
+                messagebox.showinfo("Información", "Reserva eliminada.") # Se muestra un mensaje de éxito
                 
-                if not self.reservas:
-                    messagebox.showinfo("Información", "Se han eliminado todas las reservas.")
-                    self.ventana.destroy()
-                    app = Reservas()
-                    app.ventana.mainloop()
-                return
-        messagebox.showinfo("Información", "No existe una reserva con ese nombre")
+                if not self.reservas: # Si no hay reservas guardadas
 
+                    messagebox.showinfo("Información", "Se han eliminado todas las reservas.") # Se muestra un mensaje de información
+                    self.ventana.destroy() # Se cierra la ventana actual
+                    app = Reservas() # Se crea una instancia de la clase Reservas
+                    app.ventana.mainloop() # Se inicia la ventana principal
+                
+                return 
+            
+        messagebox.showinfo("Información", "No existe una reserva con ese nombre") # Se muestra un mensaje de información
 
+    # Método para guardar las reservas en un archivo .json
+    # Se guardan las reservas en un archivo .json para simular una base de datos
 
-    def guardar_reservas(self):
-        with open("reservas.json", "w") as fecha1:
-            json.dump(self.reservas, fecha1)
+    def guardar_reservas(self): # Método
 
+        with open("reservas.json", "w") as fecha1: # Se abre el archivo .json de reservas
+            
+            json.dump(self.reservas, fecha1) # Se guardan las reservas en el archivo .json
 
+    # Método para volver a la ventana de reservas
+    # Se cierra la ventana actual y se abre la ventana de reservas
 
-if __name__ == '__main__':
-    app = Reservas()
-    app.ventana.mainloop()
+    def volver(self): # Método
+
+        self.ventana.destroy() # Se cierra la ventana actual
+        app = Reservas() # Se crea una instancia de la clase Reservas
+        app.ventana.mainloop() # Se inicia la ventana principal
+
+# Función principal
+# Se crea una instancia de la clase Reservas
+# Se inicia la ventana principal
+
+if __name__ == '__main__': # Función principal
+
+    app = Reservas() # Se crea una instancia de la clase Reservas
+    app.ventana.mainloop() # Se inicia la ventana principal
