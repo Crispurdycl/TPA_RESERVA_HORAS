@@ -33,9 +33,9 @@ class Reservas():
         self.estilo_principal = ("Helvetica", 24, "bold")
         self.estilo_entry = ("Arial", 10)
         self.estilo_boton = ("Arial", 10, "bold")
-        self.color_principal = "#0066cc"
-        self.color_boton = "#004080"
-        self.color_fondo_boton = "#b3d9ff"
+        self.color_principal = "#3F4FFF"
+        self.color_boton = "#3F4FFF"
+        self.color_fondo_boton = "##3F4FFF"
         self.color_texto_boton = "white"
 
         # Creación de los elementos de la interfaz gráfica mejor conocidos como widgets
@@ -46,7 +46,7 @@ class Reservas():
         # Se definen los eventos que se ejecutarán al presionar los botones "Reservar", "Cancelar" y "Ver reservas"
         # Estos llamaran a los metodos reservar(), cancelar() y abrir_reserva() respectivamente
 
-        self.frame_principal = tk.Frame(self.ventana, bg='#f0f0f0')
+        self.frame_principal = tk.Frame(self.ventana)
         self.frame_principal.pack(expand=True, padx=20, pady=20)
 
         self.titulo = tk.Label(self.frame_principal, text="Bienvenido a tu programa de reservas favorito", font=self.estilo_principal, fg=self.color_principal, bg='#f0f0f0')
@@ -104,9 +104,9 @@ class Reservas():
 
         self.descripcion =  {
 
-            'Cancha de Fútbol': 'Panamá, Osorno, Chile. Cancha de fútbol de césped sintético, baños y vestuarios disponibles, horario de 8:00 hasta 23:00.\n Entrada accesible para personas en silla de ruedas.\n Estacionamiento accesible para personas en silla de ruedas. \n Piscina disponible. \n Ideal para ir con niños.',
-            'Cancha de Tenis': 'José Fruto Sáez S/N, Osorno, Chile. Cancha de tenis de arcilla, baños y vestuarios disponibles, horario de 8:00 hasta 23:00.',
-            'Cancha de Pádel': 'Camino a Puerto Octay km 1 , Osorno, Chile. Cancha de pádel de cemento, baños y vestuarios disponibles, horario de 8:00 hasta 23:00.'
+            'Cancha de Fútbol': 'Panamá, Osorno, Chile. Cancha de fútbol de césped sintético, baños y vestuarios disponibles, horario de 8:00 hasta 23:00.\n Entrada accesible para personas en silla de ruedas.\n Estacionamiento accesible para personas en silla de ruedas. \n Piscina disponible. \n Ideal para ir con niños.\n $50000 c/h',
+            'Cancha de Tenis': 'José Fruto Sáez S/N, Osorno, Chile. Cancha de tenis de arcilla, baños y vestuarios disponibles, horario de 8:00 hasta 23:00. \n $30000 c/h',
+            'Cancha de Pádel': 'Camino a Puerto Octay km 1 , Osorno, Chile. Cancha de pádel de cemento, baños y vestuarios disponibles, horario de 8:00 hasta 23:00. \n $25000 c/h'
 
         }
 
@@ -506,7 +506,7 @@ class VisualizarReservas():
 
     # Método para volver a la ventana de reservas
     # Se cierra la ventana actual y se abre la ventana de reservas
-
+ 
     def volver(self): # Método
 
         self.ventana.destroy() # Se cierra la ventana actual
