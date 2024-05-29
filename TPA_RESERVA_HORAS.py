@@ -542,9 +542,8 @@ class Recintos():
         self.estilo_principal = ("Helvetica", 24, "bold")
         self.estilo_entry = ("Arial", 10)
         self.estilo_boton = ("Arial", 10, "bold")
-        self.color_principal = "#0066cc"
-        self.color_boton = "#004080"
-        self.color_fondo_boton = "#b3d9ff"
+        self.color_principal = "#3F4FFF"
+        self.color_boton = "#3F4FFF"
         self.color_texto_boton = "white"
 
         # Creación de los elementos de la interfaz gráfica mejor conocidos como widgets
