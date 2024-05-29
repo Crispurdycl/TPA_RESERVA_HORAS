@@ -35,7 +35,6 @@ class Reservas():
         self.estilo_boton = ("Arial", 10, "bold")
         self.color_principal = "#3F4FFF"
         self.color_boton = "#3F4FFF"
-        self.color_fondo_boton = "##3F4FFF"
         self.color_texto_boton = "white"
 
         # Creación de los elementos de la interfaz gráfica mejor conocidos como widgets
@@ -87,6 +86,9 @@ class Reservas():
         self.abrir_reserva_boton = tk.Button(self.frame_principal, text="Ver reservas", command=self.abrir_reserva, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
         self.abrir_reserva_boton.pack(pady=10)
 
+        self.ver_recintos_boton = tk.Button(self.frame_principal, text="Ver recintos", command=self.ver_recintos, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
+        self.ver_recintos_boton.pack(pady=10)
+
         # creamos un diccionario con las imagenes de los recintos para que no se borren al ejecutar el programa
 
         self.imagenes = {
@@ -113,11 +115,9 @@ class Reservas():
         self.descripcion_label = tk.Label(self.frame_principal, bg='#f0f0f0')
         self.descripcion_label.pack()
 
-
     ###############################################################################
     ########################### MÉTODOS DE LA CLASE ###############################
     ###############################################################################
-
 
     # Llamamos a la función reservar() cuando se presiona el botón "Reservar"
     # Esta función se encarga de validar los datos ingresados por el usuario y de realizar la reserva
@@ -130,52 +130,49 @@ class Reservas():
         recinto = self.recinto_select.get() # Se obtienen los datos ingresados por el usuario x2
         hora = self.hora_select.get() # Se obtienen los datos ingresados por el usuario x3
     
-        while True: # Bucle infinito para validar los datos ingresados por el usuario
+        if not nombre: # Si no se ingresa un nombre de usuario
 
-            if not nombre: # Si no se ingresa un nombre de usuario
-
-                messagebox.showerror("Error", "Debe ingresar un nombre de usuario") # Se muestra un mensaje de error
-                break
-
-            elif len(nombre) < 3 or len(nombre) > 25: # Si el nombre de usuario tiene menos de 3 letras o más de 25
-                    
-                messagebox.showerror("Error", "El nombre de usuario debe tener al menos 3 letras y no más de 25") # Se muestra un mensaje de error
-                break
-
-            elif any(character.isdigit() for character in nombre): # Si el nombre de usuario contiene números
-
-                messagebox.showerror("Error", "El nombre de usuario no puede contener números") # Se muestra un mensaje de error
-                break
-
-            elif not recinto or recinto == "Seleccione una opción": # Si no se selecciona un recinto
-
-                messagebox.showerror("Error", "Debe seleccionar un recinto") # Se muestra un mensaje de error
-                break
-
-            elif not hora or hora == "Seleccione hora": # Si no se selecciona una hora
-
-                messagebox.showerror("Error", "Debe seleccionar una hora") # Se muestra un mensaje de error
-                break
-
-            elif any(reserva["nombre"] == nombre for reserva in self.reservas_guardadas): # Si el usuario ya ha reservado una hora en algún recinto
+            messagebox.showerror("Error", "Debe ingresar un nombre de usuario") # Se muestra un mensaje de error
             
-                messagebox.showerror("Error", "Solo puedes reservar 1 hora por día en alguna de nuestros establecimientos") # Se muestra un mensaje de error
-                break
 
-            elif any(reserva["recinto"] == recinto and reserva["hora"] == hora for reserva in self.reservas_guardadas): # Si el horario ya ha sido reservado para el recinto seleccionado
+        elif len(nombre) < 3 or len(nombre) > 25: # Si el nombre de usuario tiene menos de 3 letras o más de 25
+                
+            messagebox.showerror("Error", "El nombre de usuario debe tener al menos 3 letras y no más de 25") # Se muestra un mensaje de error
             
-                messagebox.showerror("Error", "Este horario ya ha sido reservado para este recinto") # Se muestra un mensaje de error
-                break
 
-            else:
+        elif any(character.isdigit() for character in nombre): # Si el nombre de usuario contiene números
 
-                reserva = {"nombre": nombre, "recinto": recinto, "hora": hora} # Se crea un diccionario con los datos de la reserva
-                self.reservas_guardadas.append(reserva) # Se añade la reserva a la lista de reservas guardadas
-                self.horarios_reservados.add((recinto, hora)) # Se añade el horario reservado al conjunto de horarios reservados
-                messagebox.showinfo("Reserva realizada", f"Reserva realizada con éxito\nNombre: {nombre}\nRecinto: {recinto}\nHora: {hora}") # Se muestra un mensaje de éxito
-                self.guardar_reservas() # Se guardan las reservas en el archivo .json
-                self.cancelar() # Se llama a la función cancelar() para limpiar los campos de usuario, recinto y hora
-                break
+            messagebox.showerror("Error", "El nombre de usuario no puede contener números") # Se muestra un mensaje de error
+            
+
+        elif not recinto or recinto == "Seleccione una opción": # Si no se selecciona un recinto
+
+            messagebox.showerror("Error", "Debe seleccionar un recinto") # Se muestra un mensaje de error
+            
+
+        elif not hora or hora == "Seleccione hora": # Si no se selecciona una hora
+
+            messagebox.showerror("Error", "Debe seleccionar una hora") # Se muestra un mensaje de error
+            
+
+        elif any(reserva["nombre"] == nombre for reserva in self.reservas_guardadas): # Si el usuario ya ha reservado una hora en algún recinto
+        
+            messagebox.showerror("Error", "Solo puedes reservar 1 hora por día en alguna de nuestros establecimientos") # Se muestra un mensaje de error
+            
+
+        elif any(reserva["recinto"] == recinto and reserva["hora"] == hora for reserva in self.reservas_guardadas): # Si el horario ya ha sido reservado para el recinto seleccionado
+        
+            messagebox.showerror("Error", "Este horario ya ha sido reservado para este recinto") # Se muestra un mensaje de error
+            
+
+        else:
+
+            reserva = {"nombre": nombre, "recinto": recinto, "hora": hora} # Se crea un diccionario con los datos de la reserva
+            self.reservas_guardadas.append(reserva) # Se añade la reserva a la lista de reservas guardadas
+            self.horarios_reservados.add((recinto, hora)) # Se añade el horario reservado al conjunto de horarios reservados
+            messagebox.showinfo("Reserva realizada", f"Reserva realizada con éxito\nNombre: {nombre}\nRecinto: {recinto}\nHora: {hora}") # Se muestra un mensaje de éxito
+            self.guardar_reservas() # Se guardan las reservas en el archivo .json
+            self.cancelar() # Se llama a la función cancelar() para limpiar los campos de usuario, recinto y hora
 
 
 
@@ -239,6 +236,7 @@ class Reservas():
         # por otro lado la letra "r" indica que se va a leer el archivo .json y si el archivo no existe, se produce un error
 
 
+
     # Método para listar las reservas guardadas
     # Se listan las reservas guardadas en el archivo .json
     # Se muestran en un cuadro de texto las reservas guardadas
@@ -293,6 +291,16 @@ class Reservas():
 
 
 
+    # Método para ver los recintos disponibles
+    # Se cierra la ventana actual y se abre la ventana de recintos
+
+    def ver_recintos(self):
+            
+            self.ventana.destroy() 
+            app3 = Recintos()
+            app3.ventana.mainloop()
+
+
 
 
 # clase para visualizar las reservas guardadas
@@ -309,7 +317,7 @@ class VisualizarReservas():
         # Creación de la ventana principal, definición de su tamaño y título
         
         self.ventana = tk.Tk()
-        self.ventana.geometry('800x600')
+        self.ventana.geometry('1600x1200')
         self.ventana.title("Reservaciones ICINF")
         self.ventana.configure(bg='#f0f0f0')
 
@@ -318,9 +326,8 @@ class VisualizarReservas():
         self.estilo_principal = ("Helvetica", 24, "bold")
         self.estilo_entry = ("Arial", 10)
         self.estilo_boton = ("Arial", 10, "bold")
-        self.color_principal = "#0066cc"
-        self.color_boton = "#004080"
-        self.color_fondo_boton = "#b3d9ff"
+        self.color_principal = "#3F4FFF"
+        self.color_boton = "#3F4FFF"
         self.color_texto_boton = "white"
 
         # Creación de los elementos de la interfaz gráfica mejor conocidos como widgets
@@ -513,6 +520,143 @@ class VisualizarReservas():
         app = Reservas() # Se crea una instancia de la clase Reservas
         app.ventana.mainloop() # Se inicia la ventana principal
 
+
+
+
+
+class Recintos():
+
+    # Constructor de la clase
+
+    def __init__(self):
+
+        # Creación de la ventana principal, definición de su tamaño y título
+
+        self.ventana = tk.Tk()
+        self.ventana.geometry('800x600')
+        self.ventana.title("Reservaciones ICINF")
+        self.ventana.configure(bg='#f0f0f0')
+
+        # Estilos de la interfaz gráfica
+
+        self.estilo_principal = ("Helvetica", 24, "bold")
+        self.estilo_entry = ("Arial", 10)
+        self.estilo_boton = ("Arial", 10, "bold")
+        self.color_principal = "#0066cc"
+        self.color_boton = "#004080"
+        self.color_fondo_boton = "#b3d9ff"
+        self.color_texto_boton = "white"
+
+        # Creación de los elementos de la interfaz gráfica mejor conocidos como widgets
+        # Se crean etiquetas, campos de entrada y botones
+        # Se definen las propiedades de cada widget
+        # Se empaquetan los widgets en un frame principal
+        # Se empaqueta el frame principal en la ventana principal
+        # Se definen los eventos que se ejecutarán al presionar los botones "Cancha de Fútbol", "Cancha de Tenis" y "Cancha de Pádel"
+        # Estos llamaran a los metodos cancha_futbol(), cancha_tenis() y cancha_padel() respectivamente
+
+        self.frame_principal = tk.Frame(self.ventana, bg='#f0f0f0')
+        self.frame_principal.pack(expand=True, padx=20, pady=20)
+
+        self.titulo = tk.Label(self.frame_principal, text="Recintos", font=self.estilo_principal, fg=self.color_principal, bg='#f0f0f0')
+        self.titulo.pack(pady=10)
+        
+        self.dialogo = tk.Label(self.frame_principal, text="Selecciona un recinto para ver su descripción", font=self.estilo_entry, bg='#f0f0f0')
+        self.dialogo.pack(pady=10)
+
+        self.cancha_futbol_boton = tk.Button(self.frame_principal, text="Cancha de Fútbol", command=self.cancha_futbol , font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
+
+        self.cancha_futbol_boton.pack(pady=10)
+
+        self.cancha_tenis_boton = tk.Button(self.frame_principal, text="Cancha de Tenis", command=self.cancha_tenis, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
+        self.cancha_tenis_boton.pack(pady=10)
+
+        self.cancha_padel_boton = tk.Button(self.frame_principal, text="Cancha de Pádel", command=self.cancha_padel, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
+        self.cancha_padel_boton.pack(pady=10)
+
+        self.volver_boton = tk.Button(self.frame_principal, text="Volver", command=self.volver, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
+        self.volver_boton.pack(pady=10)
+        
+        self.imagen_label = tk.Label(self.frame_principal, bg='#f0f0f0')
+        self.imagen_label.pack()
+
+    ###############################################################################
+    ########################### MÉTODOS DE LA CLASE ###############################
+    ###############################################################################
+
+    # Se muestra la descripción de la cancha de fútbol en la interfaz gráfica
+
+    def cancha_futbol(self): # Método
+        
+        imagen = Image.open("cancha.png") # Se carga la imagen de la cancha de fútbol
+        imagen = imagen.resize((400, 400), Image.ANTIALIAS) # Se redimensiona la imagen de la cancha de fútbol
+        imagen = ImageTk.PhotoImage(imagen) # Se carga la imagen de la cancha de fútbol
+        self.imagen_label.config(image=imagen) # Se muestra la imagen de la cancha de fútbol
+        self.imagen_label.image = imagen  # Referencia necesaria para evitar que la imagen sea eliminada por el recolector de basura
+
+        self.dialogo.config(text="Cancha de Fútbol\nPanamá, Osorno, Chile. Cancha de fútbol de césped sintético, baños y vestuarios disponibles, horario de 8:00 hasta 23:00.\n Entrada accesible para personas en silla de ruedas.\n Estacionamiento accesible para personas en silla de ruedas. \n Piscina disponible. \n Ideal para ir con niños.\n $50000 c/h")
+
+
+
+    # Método para mostrar la descripción de la cancha de tenis
+
+    def cancha_tenis(self): # Método
+            
+        imagen = Image.open("tenis.png") # Se carga la imagen de la cancha de tenis
+        imagen = imagen.resize((400, 400), Image.ANTIALIAS) # Se redimensiona la imagen de la cancha de tenis
+        imagen = ImageTk.PhotoImage(imagen) # Se carga la imagen de la cancha de tenis
+        self.imagen_label.config(image=imagen) # Se muestra la imagen de la cancha de tenis
+        self.imagen_label.image = imagen  # Referencia necesaria para evitar que la imagen sea eliminada por el recolector de basura
+        
+        self.dialogo.config(text="Cancha de Tenis\nJosé Fruto Sáez S/N, Osorno, Chile. Cancha de tenis de arcilla, baños y vestuarios disponibles, horario de 8:00 hasta 23:00. \n $30000 c/h")
+
+
+
+    # Método para mostrar la descripción de la cancha de pádel
+
+    def cancha_padel(self): # Método
+
+        imagen = Image.open("padel.png") # Se carga la imagen de la cancha de pádel
+        imagen = imagen.resize((400, 400), Image.ANTIALIAS) # Se redimensiona la imagen de la cancha de pádel
+        imagen = ImageTk.PhotoImage(imagen) # Se carga la imagen de la cancha de pádel
+        self.imagen_label.config(image=imagen) # Se muestra la imagen de la cancha de pádel
+        self.imagen_label.image = imagen  # Referencia necesaria para evitar que la imagen sea eliminada por el recolector de basura
+
+        self.dialogo.config(text="Cancha de Pádel\nCamino a Puerto Octay km 1 , Osorno, Chile. Cancha de pádel de cemento, baños y vestuarios disponibles, horario de 8:00 hasta 23:00. \n $25000 c/h")
+    
+
+
+    # Método para mostrar la imagen del recinto seleccionado
+
+    def mostrar_imagen(self, recinto): # Método
+
+        imagen = self.imagenes.get(recinto) # Se obtiene la imagen del recinto seleccionado
+        imagen = imagen.resize((400, 400), Image.ANTIALIAS) # Se redimensiona la imagen del recinto seleccionado
+        
+        # antialias es un método de suavizado de la imagen para evitar el efecto de escalera
+        # se utiliza para mejorar la calidad de la imagen redimensionada
+        # para entender mejor el efecto de escalera, se puede ver en la imagen de la cancha de fútbol como las líneas de la cancha se ven pixeladas
+
+        if imagen: # Si se encuentra la imagen del recinto seleccionado
+
+            imagen = ImageTk.PhotoImage(imagen) # Se carga la imagen del recinto seleccionado
+            self.imagen_label.config(image=imagen) # Se muestra la imagen del recinto seleccionado
+            self.imagen_label.image = imagen  # Referencia necesaria para evitar que la imagen sea eliminada por el recolector de basura
+        
+        else: # Si no se encuentra la imagen del recinto seleccionado
+        
+            self.imagen_label.image = None # Se muestra la imagen del recinto seleccionado, o en este caso, no se muestra ninguna imagen
+
+
+
+    # Método para volver a la ventana de reservas
+
+    def volver(self): # Método
+            
+            self.ventana.destroy()
+            app = Reservas()
+            app.ventana.mainloop()
+    
 
 
 
