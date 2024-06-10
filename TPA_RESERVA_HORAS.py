@@ -26,8 +26,6 @@ class Reservas():
         self.ventana = tk.Tk()
         self.ventana.geometry('1600x1200')
         self.ventana.title("Reservaciones ICINF")
-        self.ventana.configure(bg='#f0f0f0')
-
         # Estilos de la interfaz gráfica
 
         self.estilo_principal = ("Helvetica", 24, "bold")
@@ -319,7 +317,6 @@ class VisualizarReservas():
         self.ventana = tk.Tk()
         self.ventana.geometry('1600x1200')
         self.ventana.title("Reservaciones ICINF")
-        self.ventana.configure(bg='#f0f0f0')
 
         # Estilos de la interfaz gráfica
 
@@ -535,8 +532,7 @@ class Recintos():
         self.ventana = tk.Tk()
         self.ventana.geometry('800x600')
         self.ventana.title("Reservaciones ICINF")
-        self.ventana.configure(bg='#f0f0f0')
-
+        
         # Estilos de la interfaz gráfica
 
         self.estilo_principal = ("Helvetica", 24, "bold")
