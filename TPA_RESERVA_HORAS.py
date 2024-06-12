@@ -35,6 +35,7 @@ class Reservas():
         self.color_boton = "#3F4FFF"
         self.color_texto_boton = "white"
 
+
         # Creación de los elementos de la interfaz gráfica mejor conocidos como widgets
         # Se crean etiquetas, campos de entrada, menús desplegables y botones
         # Se definen las propiedades de cada widget
@@ -72,19 +73,19 @@ class Reservas():
         self.hora_select_menu.config(font=self.estilo_entry, highlightthickness=2)
         self.hora_select_menu.pack(pady=5)
         
-        self.reservar_boton = tk.Button(self.frame_principal, text="Reservar", command=self.reservar, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
+        self.reservar_boton = tk.Button(self.frame_principal, text="Reservar", command=self.reservar, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5)
         self.reservar_boton.pack(pady=10)
 
-        self.cancelar_boton = tk.Button(self.frame_principal, text="Cancelar", command=self.cancelar, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
+        self.cancelar_boton = tk.Button(self.frame_principal, text="Cancelar", command=self.cancelar, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5)
         self.cancelar_boton.pack(pady=5)
 
         self.reservas_guardadas = []  
         self.horarios_reservados = set()
 
-        self.abrir_reserva_boton = tk.Button(self.frame_principal, text="Ver reservas", command=self.abrir_reserva, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
+        self.abrir_reserva_boton = tk.Button(self.frame_principal, text="Ver reservas", command=self.abrir_reserva, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5)
         self.abrir_reserva_boton.pack(pady=10)
 
-        self.ver_recintos_boton = tk.Button(self.frame_principal, text="Ver recintos", command=self.ver_recintos, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5, bd=0)
+        self.ver_recintos_boton = tk.Button(self.frame_principal, text="Ver recintos", command=self.ver_recintos, font=self.estilo_boton, bg=self.color_boton, fg=self.color_texto_boton, padx=10, pady=5)
         self.ver_recintos_boton.pack(pady=10)
 
         # creamos un diccionario con las imagenes de los recintos para que no se borren al ejecutar el programa
@@ -338,7 +339,7 @@ class VisualizarReservas():
         self.frame_principal = tk.Frame(self.ventana, bg='#f0f0f0')
         self.frame_principal.pack(expand=True, padx=20, pady=20)
 
-        self.titulo = tk.Label(self.frame_principal, text="Visualizar reservas", font=self.estilo_principal, fg=self.color_principal, bg='#f0f0f0')
+        self.titulo = tk.Label(self.frame_principal, text="Visualizar reservas", font=self.estilo_principal, fg=self.color_principal, bg='#f0f0f0', border=5)
         self.titulo.pack(pady=10)
         
         self.dialogo = tk.Label(self.frame_principal, text="Aquí puedes buscar y eliminar reservas por el nombre del usuario", font=self.estilo_entry, bg='#f0f0f0')
@@ -530,9 +531,9 @@ class Recintos():
         # Creación de la ventana principal, definición de su tamaño y título
 
         self.ventana = tk.Tk()
-        self.ventana.geometry('800x600')
+        self.ventana.geometry('1600x1200')
         self.ventana.title("Reservaciones ICINF")
-        
+
         # Estilos de la interfaz gráfica
 
         self.estilo_principal = ("Helvetica", 24, "bold")
